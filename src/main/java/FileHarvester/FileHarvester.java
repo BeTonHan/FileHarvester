@@ -77,8 +77,8 @@ public class FileHarvester{
         }
         else {
             System.out.println("Lade Datei " + rootFolder + "/" + fileName + "herunter.");
-            nxtInstance.downloadFile(rootFolder + "/" + fileName, "C:\\Users\\BT\\Desktop\\Ablage\\Testordner1");
-            //String checksum = getChecksum("C:\\Users\\BT\\Desktop\\Ablage\\Testordner1\\" + fileName);
+            nxtInstance.downloadFile(rootFolder + "/" + fileName, "");
+            //String checksum = getChecksum("" + fileName);
             //System.out.println(fileName + "ist eine Datei mit der checksum " + checksum);
             //fileInfoList.add(new FileInfo(rootFolder, fileName, checksum));
         }
