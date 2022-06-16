@@ -60,37 +60,43 @@ public class FileHarvester{
     //@param nxtInstance Object that points to the Nextcloud-instance
     //@param rootFolder Path of the Nextcloud-instance
     public void harvestFileInfo(String fileName, NextcloudConnector nxtInstance, String rootFolder) throws IOException, NoSuchAlgorithmException {
-
-        if (!fileName.contains(".")) {
-            //Check for directory (file contains no ".")
+        //Check for directory with regular expression
+        if (!fileName.matches("^.*\\..{2,4}$")) {
+        //if (nxtInstance.folderExists(fileName)) {
             List <String> folderContent = nxtInstance.listFolderContent(rootFolder);
 
             System.out.println("Der aktuell betrachtete Ordner enthält folgende Dateien und Verzeichnisse: " + folderContent);
-            System.out.println(fileName + "ist ein Verzeichnis. Rufe Methode auf mit " + fileName + " und dem Pfad " + rootFolder );
+            //System.out.println(fileName + " ist ein Verzeichnis. Rufe Methode auf mit " + fileName + " und dem Pfad " + rootFolder );
             for (int i=1; i< folderContent.size(); i++) {
-                //for-loop start at 1 because the first entry of nxtInstance is the Name of the root folder.
                 fileName = folderContent.get(i);
-                if (!fileName.contains(".")) rootFolder = rootFolder + "/" + folderContent.get(i);
-                //if fileName is a folder, the rootFolder-path is adjusted accordingly.
-                harvestFileInfo(fileName, nxtInstance, rootFolder);
+                //Rekursiver Aufruf für Ordner
+                if (!fileName.matches("^.*\\..{2,4}$")) {
+                    //if fileName is a folder, the rootFolder-path is adjusted accordingly.
+                    harvestFileInfo(fileName, nxtInstance, rootFolder + "/" + folderContent.get(i));
+                }
+                //Rekursiver Aufruf für Dateien
+                else {
+                    harvestFileInfo(fileName, nxtInstance, rootFolder);
+                }
             }
         }
         else {
-            System.out.println("Lade Datei " + rootFolder + "/" + fileName + "herunter.");
-            nxtInstance.downloadFile(rootFolder + "/" + fileName, "");
-            //String checksum = getChecksum("" + fileName);
-            //System.out.println(fileName + "ist eine Datei mit der checksum " + checksum);
-            //fileInfoList.add(new FileInfo(rootFolder, fileName, checksum));
+            if (!fileName.equals("FileInfo.ods")) {
+                System.out.println("Lade Datei " + rootFolder + "/" + fileName + " herunter.");
+                nxtInstance.downloadFile(rootFolder + "/" + fileName, System.getProperty("user.dir"));
+                String checksum = hash.createHash(fileName, false);
+                fileInfoList.add(new FileInfo(rootFolder, fileName, checksum));
+            }
         }
 
     }
 
-    public void harvestNextCloud(String serverAdress, String user, String password) throws IOException, NoSuchAlgorithmException {
+    public void harvestNextCloud(String serverAdress, String user, String password, String path) throws IOException, NoSuchAlgorithmException {
         List<String> currentFolderContent;
         NextcloudConnector nxtCldInstance = new NextcloudConnector(serverAdress, user, password);
-        currentFolderContent = nxtCldInstance.listFolderContent("/KM-EP");
+        currentFolderContent = nxtCldInstance.listFolderContent(path);
         //Read out root folder content
-        harvestFileInfo("KM-EP", nxtCldInstance, "/KM-EP");
+        harvestFileInfo("", nxtCldInstance, path);
     }
 
     private void downloadFile(SmbFile file) throws IOException, NoSuchAlgorithmException {

@@ -29,7 +29,7 @@ public class QuickHasher {
         String checksum = checksum(mdigest, file);
 
         //Falls path eine kopierte Datei ist, wird diese gelöscht
-        if (!isLocalFile) {
+        if ((!isLocalFile) && (!file.getName().equals("FileInfo.ods")))  {
             file.delete();
             System.out.println("Datei " + file.getName() + " gelöscht.");
         }
@@ -38,7 +38,7 @@ public class QuickHasher {
         return checksum;
     }
 
-    // this method return the complete  hash of the file
+    // this method returns the complete  hash of the file
     // passed
     private static String checksum(MessageDigest digest,
                                    File file)
@@ -66,7 +66,6 @@ public class QuickHasher {
         byte[] bytes = digest.digest();
 
         //  converts bytes from decimal to hexadecimal format
-
         StringBuilder sb = new StringBuilder();
 
         // loop through the bytes array

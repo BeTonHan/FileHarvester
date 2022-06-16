@@ -12,7 +12,8 @@ public class Main {
     public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 
         Scanner in = new Scanner(System.in);
-        System.out.println("Bitte wählen zwischen lokalem Dateipfad (l) oder Netzwerk-Ordner (n).");
+        System.out.println("Version vom 11.3.2022:");
+        System.out.println("Bitte wählen zwischen lokalem Dateipfad (l), Nextcloud-Ordner (x) oder Netzwerk-Ordner (n).");
         String fileSystem = in.nextLine();
         System.out.println("Bitte den Wurzel-Datei-Pfad der zu durchsuchenden Ordnerstruktur angeben.");
         System.out.println("Beim Netzwerk-Ordner ist //fsfl.fernuni-hagen.de/fl-groups$/ bereits vorgegeben.");
@@ -42,8 +43,19 @@ public class Main {
             System.out.println("Beginne mit Sammlung der Dateiinformationen...");
             fileHarvester.harvestFileInfo(smbFile);
         }
+        else if (fileSystem.equals("x")){
+            System.out.println("Bitte geben Sie Ihren User-Namen ein: ");
+            String user = in.nextLine();
+            System.out.println("Bitte geben Sie Ihr Passwort ein: ");
+            String pass = in.nextLine();
+            System.out.println("Bitte geben Sie den Ordnerpfad ein, den Sie erfassen möchten, z.B. KM-EP/Ordner1");
+            String nxPath = in.nextLine();
+            System.out.println("Beginne mit Sammlung der Dateiinformationen...");
+            fileHarvester.harvestNextCloud(path, user, pass, nxPath);
+        }
         fileManipulator.writeToSheet(fileHarvester.getFileInfoList());
+        System.out.println("Alle Dateien erfolgreich erfasst!");
         in.close();
-
+        System.exit(0);
     }
 }
